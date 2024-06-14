@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/front-layout.css') }}">
+    <title>IDAssembler | Layout</title>
+</head>
+<body>
+
+    <div id="controlbox">
+        cont
+    </div>
+
+    <div class="bottom" id="toolbox">
+        tool
+        <button id="draw">Free Drawing</button>
+        <div id="text-controls">
+            <label for="font-family">Font Family:</label>
+            <select id="font-family"></select>
+            <label for="text-color">Text Color:</label>
+            <input type="color" id="text-color">
+            <label for="font-size">Font Size:</label>
+            <input type="number" id="font-size" value="40">
+            </div>
+        <button id="text">Add Text</button>
+        <button id="save">Save Canvas Data</button>
+
+    </div>
+
+    <div class="bottom" id="right">
+        <div id="workspace">
+            <canvas id="canvas" data-image-url="{{ url_for('uploaded_file', filename='front.png') }}"></canvas>
+        </div>
+        <button id="replace">Replace</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fabric@5.2.4/dist/fabric.min.js"></script>
+    <script src="{{ url_for('static', filename='js/front-layout.js') }}"></script>
+</body>
+</html>
