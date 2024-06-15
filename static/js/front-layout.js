@@ -1,8 +1,12 @@
-// Function to initialize Fabric.js canvas
+/**
+ * Initializes a Fabric.js canvas with a specified ID and optional default background image.
+ * @param {string} id - The ID of the canvas element.
+ * @param {string} [defaultImageUrl] - The URL of the default background image.
+ * @returns {fabric.Canvas} The initialized Fabric.js canvas.
+ */
 const initializeCanvas = (id, defaultImageUrl) => {
     const canvas = new fabric.Canvas(id, {});
 
-    // Set default background image
     if (defaultImageUrl) {
         fabric.Image.fromURL(defaultImageUrl, (img) => {
             const container = canvas.wrapperEl.parentNode.getBoundingClientRect();
@@ -12,6 +16,7 @@ const initializeCanvas = (id, defaultImageUrl) => {
             const imageAspectRatio = img.width / img.height;
             let canvasWidth, canvasHeight;
 
+            // Adjust canvas size based on image aspect ratio and container dimensions
             if (img.width > img.height) {
                 canvasWidth = Math.min(img.width, maxContainerWidth);
                 canvasHeight = canvasWidth / imageAspectRatio;
@@ -38,6 +43,7 @@ const initializeCanvas = (id, defaultImageUrl) => {
                 originY: 'top'
             });
 
+            // Center the canvas element in the parent container
             const canvasElement = canvas.getElement();
             canvasElement.style.position = 'absolute';
             canvasElement.style.left = '50%';
@@ -49,7 +55,12 @@ const initializeCanvas = (id, defaultImageUrl) => {
     return canvas;
 };
 
-// Function to set background image on canvas and resize
+/**
+ * Sets the background image on the canvas and resizes the canvas to fit within the container.
+ * @param {string} url - The URL of the image to set as the background.
+ * @param {fabric.Canvas} canvas - The Fabric.js canvas object.
+ * @param {DOMRect} container - The container's bounding rectangle for dimension constraints.
+ */
 const setBackgroundAndResizeCanvas = (url, canvas, container) => {
     fabric.Image.fromURL(url, (img) => {
         const maxContainerWidth = container.width * 0.9;
@@ -58,6 +69,7 @@ const setBackgroundAndResizeCanvas = (url, canvas, container) => {
         const imageAspectRatio = img.width / img.height;
         let canvasWidth, canvasHeight;
 
+        // Adjust canvas size based on image aspect ratio and container dimensions
         if (img.width > img.height) {
             canvasWidth = Math.min(img.width, maxContainerWidth);
             canvasHeight = canvasWidth / imageAspectRatio;
@@ -84,6 +96,7 @@ const setBackgroundAndResizeCanvas = (url, canvas, container) => {
             originY: 'top'
         });
 
+        // Center the canvas element in the parent container
         const canvasElement = canvas.getElement();
         canvasElement.style.position = 'absolute';
         canvasElement.style.left = '50%';
@@ -92,7 +105,10 @@ const setBackgroundAndResizeCanvas = (url, canvas, container) => {
     });
 };
 
-// Function to lock text object controls
+/**
+ * Locks the scaling and rotation of a Fabric.js text object.
+ * @param {fabric.IText} obj - The Fabric.js text object to lock.
+ */
 const lockTextObject = (obj) => {
     if (obj && obj.type === 'i-text') {
         obj.set({
@@ -108,12 +124,16 @@ const lockTextObject = (obj) => {
     }
 };
 
-// Function to update text properties for selected objects
+/**
+ * Updates properties of selected text objects on the canvas.
+ * @param {Array<fabric.Object>} objects - The selected objects to update.
+ * @param {Object} properties - The properties to update on the selected objects.
+ */
 const updateSelectedTextObjects = (objects, properties) => {
     objects.forEach(obj => {
         if (obj.type === 'i-text') {
             obj.set(properties);
-            lockTextObject(obj); // Ensure text object remains locked
+            lockTextObject(obj); 
         }
     });
     canvas.renderAll();
@@ -133,7 +153,7 @@ const fonts = [
     "Lora", "Roboto Slab", "Open Sans Condensed", "Yanone Kaffeesatz"
 ];
 
-// DOM elements
+// Initialize canvas and container
 const canvas = initializeCanvas('canvas', "/uploads/front.png");
 const container = document.getElementById('workspace').getBoundingClientRect();
 const fontFamilySelect = document.getElementById('font-family');
@@ -150,10 +170,37 @@ fonts.forEach(font => {
     fontFamilySelect.appendChild(option);
 });
 
-// Event listener for text tool
+/**
+ * Checks if a text string is unique among the existing text objects on the canvas.
+ * @param {string} text - The text string to check for uniqueness.
+ * @returns {boolean} True if the text is unique, false otherwise.
+ */
+function isTextUnique(text) {
+    const existingTexts = canvas.getObjects().filter(obj => {
+        if (obj.type === 'i-text' && obj.text.startsWith(text)) {
+            return true;
+        }
+        if (obj.type === 'group') {
+            return obj.getObjects().some(innerObj => innerObj.type === 'text' && innerObj.text.startsWith(text));
+        }
+        return false;
+    });
+    return existingTexts.length === 0;
+}
+
+// Add new text object to canvas on button click
 $('#text').on('click', () => {
     canvas.isDrawingMode = false;
-    const text = new fabric.IText('Lorem ipsum', {
+
+    let newText = 'Lorem ipsum';
+    let number = 0;
+
+    while (!isTextUnique(newText)) {
+        number++;
+        newText = `Lorem ipsum ${number}`;
+    }
+
+    const text = new fabric.IText(newText, {
         left: 40,
         top: 40,
         objecttype: 'text',
@@ -161,16 +208,17 @@ $('#text').on('click', () => {
         fill: textColorInput.value,
         fontSize: parseInt(fontSizeInput.value, 10) || 40
     });
+
     lockTextObject(text);
     canvas.add(text);
 });
 
-// Event listener for replace button
+// Trigger file input click on replace button click
 $('#replace').on('click', () => {
     fileInput.click();
 });
 
-// Event listener for file input change
+// Handle file input change event
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -194,7 +242,7 @@ fileInput.addEventListener('change', (event) => {
     }
 });
 
-// Event listeners for text property controls
+// Update text properties on change or input events
 ['change', 'input'].forEach(event => {
     fontFamilySelect.addEventListener(event, () => {
         updateSelectedTextObjects(canvas.getActiveObjects(), { fontFamily: fontFamilySelect.value });
@@ -207,41 +255,43 @@ fileInput.addEventListener('change', (event) => {
     });
 });
 
-document.getElementById('save').addEventListener('click', () => {
-    const canvasObjects = canvas.getObjects().map(obj => {
-        if (obj.type === 'group') {
-            const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
-            
-            return {
-                text: text ? text.text : '',
-                type: 'group',
-                left: obj.left,
-                top: obj.top,
-                width: obj.width,
-                height: obj.height,
-                angle: obj.angle,
-            };
-        } else {
-            return {
-                text: obj.text || '',
-                type: obj.type,
-                left: obj.left,
-                top: obj.top,
-                width: obj.width,
-                height: obj.height,
-                angle: obj.angle,
-                fill: obj.fill,
-                fontFamily: obj.fontFamily,
-                fontSize: obj.fontSize
-            };
-        }
+// Add rectangle with unique label to canvas on button click
+$('#rectangle').on('click', function () {
+    canvas.isDrawingMode = false;
+
+    const rectangle = new fabric.Rect({
+        left: 40,
+        top: 40,
+        width: 60,
+        height: 60,
+        fill: 'Red'
     });
 
-    console.log(JSON.stringify(canvasObjects, null, 2));
+    let newLabelText = 'Image';
+    let number = 0;
+
+    while (!isTextUnique(newLabelText)) {
+        number++;
+        newLabelText = `Image ${number}`;
+    }
+
+    const label = new fabric.Text(newLabelText, {
+        left: rectangle.left + rectangle.width / 2,
+        top: rectangle.top + rectangle.height / 2 - 6,
+        fontSize: 10,
+        fill: 'white',
+        originX: 'center',
+        selectable: false,
+    });
+
+    const group = new fabric.Group([rectangle, label], {
+        selectable: true
+    });
+
+    canvas.add(group);
 });
-// TK instead of console give this to the server
 
-
+// Remove selected objects from canvas on button click
 $('#remove').on('click', function () {
     canvas.isDrawingMode = false;
     const activeObjects = canvas.getActiveObjects();
@@ -249,6 +299,7 @@ $('#remove').on('click', function () {
     canvas.discardActiveObject().renderAll();
 });
 
+// Event handler for selection created on canvas
 canvas.on('selection:created', (event) => {
     const selectedObjects = event.selected;
     $('#remove').prop('disabled', selectedObjects.length === 0);
@@ -261,6 +312,7 @@ canvas.on('selection:created', (event) => {
     }
 });
 
+// Event handler for selection cleared on canvas
 canvas.on('selection:cleared', function () {
     $('#remove').prop('disabled', 'disabled');
     fontFamilySelect.disabled = false;
@@ -268,33 +320,51 @@ canvas.on('selection:cleared', function () {
     fontSizeInput.disabled = false;
 });
 
-let rectangleCount = 1;
+// Document ready event handler
+$(document).ready(function() {
+    $('#save').click(function() {
+        const canvasObjects = canvas.getObjects().map(obj => {
+            if (obj.type === 'group') {
+                const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
+                return {
+                    text: text ? text.text : '',
+                    type: 'group',
+                    left: obj.left,
+                    top: obj.top,
+                    width: obj.width,
+                    height: obj.height,
+                    angle: obj.angle,
+                };
+            } else {
+                return {
+                    text: obj.text || '',
+                    type: obj.type,
+                    left: obj.left,
+                    top: obj.top,
+                    width: obj.width,
+                    height: obj.height,
+                    angle: obj.angle,
+                    fill: obj.fill,
+                    fontFamily: obj.fontFamily,
+                    fontSize: obj.fontSize
+                };
+            }
+        });
 
-$('#rectangle').on('click', function () {
-    canvas.isDrawingMode = false;
-    
-    const rectangle = new fabric.Rect({
-        left: 40,
-        top: 40,
-        width: 60,
-        height: 60,
-        fill: 'Red'
+        const jsonData = JSON.stringify(canvasObjects, null, 2);
+
+        // Send data to Flask using Fetch API
+        fetch('/save_front_data', {
+            method: 'POST',
+            body: jsonData,
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  // Handle success response from Flask
+        })
+        .catch(error => {
+            console.error(error);  // Handle errors during request
+        });
     });
-
-    const label = new fabric.Text(`Image ${rectangleCount}`, {
-        left: rectangle.left + rectangle.width / 2,
-        top: rectangle.top + rectangle.height / 2 - 6,
-        fontSize: 10,
-        fill: 'white',
-        originX: 'center',
-        selectable: false,
-    });
-
-    rectangleCount++;
-
-    const group = new fabric.Group([rectangle, label], {
-        selectable: true
-    });
-
-    canvas.add(group);
 });

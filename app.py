@@ -40,5 +40,17 @@ def upload_file():
         return jsonify(success=True)
     return jsonify(success=False, message='File type not allowed')
 
+@app.route('/save_front_data', methods=['POST'])
+def save_canvas_data():
+    # Retrieve data from the request body
+    data = request.get_json()
+    print(data)
+
+    # Process the canvas object data (logic depends on your needs)
+    # You can save the data to a database, file, or perform other actions
+
+    # Return a JSON response
+    return jsonify({'message': 'Canvas data received successfully!'})
+
 if __name__ == '__main__':
   app.run(debug=True)
