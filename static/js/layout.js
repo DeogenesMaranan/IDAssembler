@@ -154,7 +154,7 @@ const fonts = [
 ];
 
 // Initialize canvas and container
-const canvas = initializeCanvas('canvas', "/uploads/front.png");
+const canvas = initializeCanvas('canvas', document.getElementById('canvas').getAttribute('data-image-url'));
 const container = document.getElementById('workspace').getBoundingClientRect();
 const fontFamilySelect = document.getElementById('font-family');
 const fontSizeInput = document.getElementById('font-size');
@@ -221,25 +221,30 @@ $('#replace').on('click', () => {
 // Handle file input change event
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
-    if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
+    if (!file) return;
 
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const imageUrl = URL.createObjectURL(file);
-                setBackgroundAndResizeCanvas(imageUrl, canvas, container);
-            } else {
-                console.error('Failed to upload image');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', layoutType);
+
+    fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+        processData: false,
+        contentType: false
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const objectURL = URL.createObjectURL(file);
+          setBackgroundAndResizeCanvas(objectURL, canvas, canvas.wrapperEl.parentNode.getBoundingClientRect());
+        } else {
+          console.error(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Upload failed:', error);
+      });      
 });
 
 // Update text properties on change or input events
@@ -320,7 +325,6 @@ canvas.on('selection:cleared', function () {
     fontSizeInput.disabled = false;
 });
 
-// Document ready event handler
 $(document).ready(function() {
     $('#save').click(function() {
         const canvasObjects = canvas.getObjects().map(obj => {
@@ -352,9 +356,10 @@ $(document).ready(function() {
         });
 
         const jsonData = JSON.stringify(canvasObjects, null, 2);
+        const saveUrl = `/save?type=${layoutType}`;
 
         // Send data to Flask using Fetch API
-        fetch('/save_front_data', {
+        fetch(saveUrl, {
             method: 'POST',
             body: jsonData,
             headers: { 'Content-Type': 'application/json' }

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/front-layout.css') }}">
-    <title>IDAssembler | Layout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <title>IDAssembler | {{ layout_type.capitalize() }} Layout</title>
 </head>
 <body>
 
     <div id="controlbox">
-        cont
+        {{ layout_type }}
+        {{ url_for('uploaded_file', filename=layout_type + '.png') }}
     </div>
 
     <div class="bottom" id="toolbox">
@@ -25,12 +26,11 @@
         <button id="remove" disabled="disabled">Remove</button>
         <button id="save">Save Canvas Data</button>
         <button id="rectangle">Add Rectangle</button>
-
     </div>
 
     <div class="bottom" id="right">
         <div id="workspace">
-            <canvas id="canvas" data-image-url="{{ url_for('uploaded_file', filename='front.png') }}"></canvas>
+            <canvas id="canvas" data-image-url="{{ url_for('uploaded_file', filename=layout_type + '.png') }}"></canvas>
         </div>
         <button id="replace">Replace</button>
         <input type="file" id="fileInput" accept="image/*" style="display: none;">
@@ -38,6 +38,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fabric@5.2.4/dist/fabric.min.js"></script>
-    <script src="{{ url_for('static', filename='js/front-layout.js') }}"></script>
+    <script>
+        const layoutType = "{{ layout_type }}";
+        const uploadUrl = `/upload?type=${layoutType}`;
+    </script>
+    <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
 </body>
 </html>
