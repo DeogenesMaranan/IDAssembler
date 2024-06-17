@@ -221,6 +221,7 @@ $('#replace').on('click', () => {
 // Handle file input change event
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
+    const uploadUrl = `/upload?type=${layoutType}`;
     if (!file) return;
 
     const formData = new FormData();
