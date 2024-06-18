@@ -1,21 +1,24 @@
 from common import *
-from core.place import *
+from core.excel import *
 
 class LayoutPage:
-    @app.route('/layout', methods=['GET'])
-    def upload():
+    @app.route('/<project_name>/layout', methods=['GET'])
+    def upload(project_name):
         layout_type = request.args.get('type')
         if layout_type in ['front', 'back']:
-            return render_template('layout.html', layout_type=layout_type)
+            return render_template('layout.html', layout_type=layout_type, project_name=project_name)
         else:
             raise NotFound()
 
-    @app.route('/uploads/<filename>')
-    def uploaded_file(filename):
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    @app.route('/<project_name>/backgrounds/<filename>')
+    def uploaded_backgrounds(project_name, filename):
+        uploads_path = os.path.join('projects', project_name, 'backgrounds')
+        return send_from_directory(uploads_path, filename)
 
-    @app.route('/upload', methods=['POST'])
-    def upload_file():
+    @app.route('/<project_name>/upload/background', methods=['POST'])
+    def upload_background(project_name):
+        uploads_path = os.path.join('projects', project_name, 'backgrounds')
+
         if 'file' not in request.files:
             return jsonify(success=False, message='No file part')
         
@@ -28,13 +31,15 @@ class LayoutPage:
 
         if file and allowed_file(file.filename):
             filename = 'front.png' if upload_type == 'front' else 'back.png'
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(uploads_path, filename))
             return jsonify(success=True)
 
         return jsonify(success=False, message='File type not allowed')
 
-    @app.route('/save', methods=['POST'])
-    def save_canvas_data():
+    @app.route('/<project_name>/save', methods=['POST'])
+    def save_canvas_data(project_name):
+        uploads_path = os.path.join('projects', project_name, 'uploads')
+        
         layout_type = request.args.get('type')
         if layout_type not in ['front', 'back']:
             return jsonify(success=False, message='Invalid layout type')
@@ -42,7 +47,7 @@ class LayoutPage:
         data = request.get_json()
         print(f"{layout_type.capitalize()} Layout Data Saved Successfully")
         try:
-            save_to_excel(data, f'{layout_type}_layout.xlsx')
+            save_to_excel(data, os.path.join('projects', project_name, f'{layout_type}_layout.xlsx'))
         except Exception as e:
             print(f"Error saving data: {e}")
             return jsonify(success=False, message="Error saving data")

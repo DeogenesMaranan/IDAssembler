@@ -4,17 +4,12 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+CORS(app)
 
-IMAGE_EXTENTIONS = {'png', 'jpg', 'jpeg', 'gif'}
+IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in IMAGE_EXTENTIONS
-
-# error.py
-from flask import render_template
-from werkzeug.exceptions import HTTPException
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in IMAGE_EXTENSIONS
 
 class ErrorHandling:
     @app.errorhandler(HTTPException)

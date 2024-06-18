@@ -221,7 +221,7 @@ $('#replace').on('click', () => {
 // Handle file input change event
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
-    const uploadUrl = `/upload?type=${layoutType}`;
+    const uploadUrl = `/${projectName}/upload/background?type=${layoutType}`;
     if (!file) return;
 
     const formData = new FormData();
@@ -357,7 +357,7 @@ $(document).ready(function() {
         });
 
         const jsonData = JSON.stringify(canvasObjects, null, 2);
-        const saveUrl = `/save?type=${layoutType}`;
+        const saveUrl = `/${projectName}/save?type=${layoutType}`; // Adjusted saveUrl to include projectName
 
         // Send data to Flask using Fetch API
         fetch(saveUrl, {
@@ -368,9 +368,11 @@ $(document).ready(function() {
         .then(response => response.json())
         .then(data => {
             console.log(data);
+            // Optionally handle success response
         })
         .catch(error => {
-            console.error(error);
+            console.error('Error saving canvas data:', error);
+            // Optionally handle error
         });
     });
 });

@@ -10,7 +10,7 @@
 
     <div id="controlbox">
         {{ layout_type }}
-        {{ url_for('uploaded_file', filename=layout_type + '.png') }}
+        {{ url_for('uploaded_backgrounds', project_name=project_name, filename=layout_type + '.png') }}
     </div>
 
     <div class="bottom" id="toolbox">
@@ -30,7 +30,7 @@
 
     <div class="bottom" id="right">
         <div id="workspace">
-            <canvas id="canvas" data-image-url="{{ url_for('uploaded_file', filename=layout_type + '.png') }}"></canvas>
+            <canvas id="canvas" data-image-url="{{ url_for('uploaded_backgrounds', project_name=project_name, filename=layout_type + '.png') }}"></canvas>
         </div>
         <button id="replace">Replace</button>
         <input type="file" id="fileInput" accept="image/*" style="display: none;">
@@ -40,6 +40,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fabric@5.2.4/dist/fabric.min.js"></script>
     <script>
         const layoutType = "{{ layout_type }}";
+        const projectName = "{{ project_name }}";
     </script>
     <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
 </body>
