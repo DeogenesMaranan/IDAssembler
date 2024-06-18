@@ -367,10 +367,10 @@ $(document).ready(function() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);  // Handle success response from Flask
+            console.log(data);
         })
         .catch(error => {
-            console.error(error);  // Handle errors during request
+            console.error(error);
         });
     });
 });

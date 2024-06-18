@@ -1,4 +1,5 @@
 from common import *
+from core.place import *
 
 class LayoutPage:
     @app.route('/layout', methods=['GET'])
@@ -22,7 +23,6 @@ class LayoutPage:
         if file.filename == '':
             return jsonify(success=False, message='No selected file')
 
-        # Debugging: Print the value of 'type' received from the form
         upload_type = request.form.get('type')
         print(f"Received type parameter: {upload_type}")
 
@@ -33,16 +33,18 @@ class LayoutPage:
 
         return jsonify(success=False, message='File type not allowed')
 
-
     @app.route('/save', methods=['POST'])
     def save_canvas_data():
         layout_type = request.args.get('type')
         if layout_type not in ['front', 'back']:
             return jsonify(success=False, message='Invalid layout type')
-        
-        # Proceed with processing and saving canvas data based on layout_type
+
         data = request.get_json()
-        print(f"{layout_type.capitalize()} Layout Data:", data)
-        # Example logic: Save data to database, file, etc.
-        
+        print(f"{layout_type.capitalize()} Layout Data Saved Successfully")
+        try:
+            save_to_excel(data, f'{layout_type}_layout.xlsx')
+        except Exception as e:
+            print(f"Error saving data: {e}")
+            return jsonify(success=False, message="Error saving data")
+
         return jsonify({'message': f'{layout_type.capitalize()} Layout Canvas data received successfully!', 'success': True})
