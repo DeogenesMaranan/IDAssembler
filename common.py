@@ -2,19 +2,26 @@ from flask import Flask, render_template, request, redirect, send_from_directory
 from werkzeug.exceptions import *
 from flask_cors import CORS
 import os
+import shutil
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+CORS(app)
 
-IMAGE_EXTENTIONS = {'png', 'jpg', 'jpeg', 'gif'}
+IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in IMAGE_EXTENTIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in IMAGE_EXTENSIONS
 
-# error.py
-from flask import render_template
-from werkzeug.exceptions import HTTPException
+def initialize_project(project_name):
+    template_folder = os.path.join('projects', '0b0a999979cc5f89916dd5e6d803f6500a8a3cdde7733f755072022ff0a17a4e')
+    project_path = os.path.abspath(os.path.join('projects', project_name))
+
+    if not os.path.exists(project_path):
+        try:
+            shutil.copytree(template_folder, project_path)
+            print(f"Template '{template_folder}' copied and renamed to '{project_name}' successfully.")
+        except Exception as e:
+            print(f"Error copying template: {e}")
 
 class ErrorHandling:
     @app.errorhandler(HTTPException)

@@ -1,9 +1,3 @@
-/**
- * Initializes a Fabric.js canvas with a specified ID and optional default background image.
- * @param {string} id - The ID of the canvas element.
- * @param {string} [defaultImageUrl] - The URL of the default background image.
- * @returns {fabric.Canvas} The initialized Fabric.js canvas.
- */
 const initializeCanvas = (id, defaultImageUrl) => {
     const canvas = new fabric.Canvas(id, {});
 
@@ -16,7 +10,6 @@ const initializeCanvas = (id, defaultImageUrl) => {
             const imageAspectRatio = img.width / img.height;
             let canvasWidth, canvasHeight;
 
-            // Adjust canvas size based on image aspect ratio and container dimensions
             if (img.width > img.height) {
                 canvasWidth = Math.min(img.width, maxContainerWidth);
                 canvasHeight = canvasWidth / imageAspectRatio;
@@ -43,7 +36,6 @@ const initializeCanvas = (id, defaultImageUrl) => {
                 originY: 'top'
             });
 
-            // Center the canvas element in the parent container
             const canvasElement = canvas.getElement();
             canvasElement.style.position = 'absolute';
             canvasElement.style.left = '50%';
@@ -55,12 +47,6 @@ const initializeCanvas = (id, defaultImageUrl) => {
     return canvas;
 };
 
-/**
- * Sets the background image on the canvas and resizes the canvas to fit within the container.
- * @param {string} url - The URL of the image to set as the background.
- * @param {fabric.Canvas} canvas - The Fabric.js canvas object.
- * @param {DOMRect} container - The container's bounding rectangle for dimension constraints.
- */
 const setBackgroundAndResizeCanvas = (url, canvas, container) => {
     fabric.Image.fromURL(url, (img) => {
         const maxContainerWidth = container.width * 0.9;
@@ -69,7 +55,6 @@ const setBackgroundAndResizeCanvas = (url, canvas, container) => {
         const imageAspectRatio = img.width / img.height;
         let canvasWidth, canvasHeight;
 
-        // Adjust canvas size based on image aspect ratio and container dimensions
         if (img.width > img.height) {
             canvasWidth = Math.min(img.width, maxContainerWidth);
             canvasHeight = canvasWidth / imageAspectRatio;
@@ -96,7 +81,6 @@ const setBackgroundAndResizeCanvas = (url, canvas, container) => {
             originY: 'top'
         });
 
-        // Center the canvas element in the parent container
         const canvasElement = canvas.getElement();
         canvasElement.style.position = 'absolute';
         canvasElement.style.left = '50%';
@@ -105,10 +89,6 @@ const setBackgroundAndResizeCanvas = (url, canvas, container) => {
     });
 };
 
-/**
- * Locks the scaling and rotation of a Fabric.js text object.
- * @param {fabric.IText} obj - The Fabric.js text object to lock.
- */
 const lockTextObject = (obj) => {
     if (obj && obj.type === 'i-text') {
         obj.set({
@@ -124,11 +104,6 @@ const lockTextObject = (obj) => {
     }
 };
 
-/**
- * Updates properties of selected text objects on the canvas.
- * @param {Array<fabric.Object>} objects - The selected objects to update.
- * @param {Object} properties - The properties to update on the selected objects.
- */
 const updateSelectedTextObjects = (objects, properties) => {
     objects.forEach(obj => {
         if (obj.type === 'i-text') {
@@ -139,7 +114,6 @@ const updateSelectedTextObjects = (objects, properties) => {
     canvas.renderAll();
 };
 
-// Array of available fonts
 const fonts = [
     "Arial", "Arial Black", "Verdana", "Tahoma", "Trebuchet MS", "Impact",
     "Times New Roman", "Didot", "Georgia", "American Typewriter", "Courier",
@@ -153,15 +127,14 @@ const fonts = [
     "Lora", "Roboto Slab", "Open Sans Condensed", "Yanone Kaffeesatz"
 ];
 
-// Initialize canvas and container
 const canvas = initializeCanvas('canvas', document.getElementById('canvas').getAttribute('data-image-url'));
 const container = document.getElementById('workspace').getBoundingClientRect();
 const fontFamilySelect = document.getElementById('font-family');
 const fontSizeInput = document.getElementById('font-size');
 const textColorInput = document.getElementById('text-color');
 const fileInput = document.getElementById('fileInput');
+const textAlignment = document.getElementById('text-alignment');
 
-// Initialize font family options
 fonts.forEach(font => {
     const option = document.createElement('option');
     option.value = font;
@@ -170,11 +143,6 @@ fonts.forEach(font => {
     fontFamilySelect.appendChild(option);
 });
 
-/**
- * Checks if a text string is unique among the existing text objects on the canvas.
- * @param {string} text - The text string to check for uniqueness.
- * @returns {boolean} True if the text is unique, false otherwise.
- */
 function isTextUnique(text) {
     const existingTexts = canvas.getObjects().filter(obj => {
         if (obj.type === 'i-text' && obj.text.startsWith(text)) {
@@ -188,7 +156,6 @@ function isTextUnique(text) {
     return existingTexts.length === 0;
 }
 
-// Add new text object to canvas on button click
 $('#text').on('click', () => {
     canvas.isDrawingMode = false;
 
@@ -201,27 +168,26 @@ $('#text').on('click', () => {
     }
 
     const text = new fabric.IText(newText, {
-        left: 40,
-        top: 40,
+        left: 40 + (number*5),
+        top: 40 + (number*5),
         objecttype: 'text',
         fontFamily: fontFamilySelect.value,
         fill: textColorInput.value,
-        fontSize: parseInt(fontSizeInput.value, 10) || 40
+        fontSize: parseInt(fontSizeInput.value, 10) || 40,
+        textAlign: textAlignment.value
     });
 
     lockTextObject(text);
     canvas.add(text);
 });
 
-// Trigger file input click on replace button click
 $('#replace').on('click', () => {
     fileInput.click();
 });
 
-// Handle file input change event
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
-    const uploadUrl = `/upload?type=${layoutType}`;
+    const uploadUrl = `/${projectName}/upload/background?type=${layoutType}`;
     if (!file) return;
 
     const formData = new FormData();
@@ -248,7 +214,6 @@ fileInput.addEventListener('change', (event) => {
       });      
 });
 
-// Update text properties on change or input events
 ['change', 'input'].forEach(event => {
     fontFamilySelect.addEventListener(event, () => {
         updateSelectedTextObjects(canvas.getActiveObjects(), { fontFamily: fontFamilySelect.value });
@@ -259,9 +224,11 @@ fileInput.addEventListener('change', (event) => {
     fontSizeInput.addEventListener(event, () => {
         updateSelectedTextObjects(canvas.getActiveObjects(), { fontSize: parseInt(fontSizeInput.value, 10) });
     });
+    textAlignment.addEventListener(event, () => {
+        updateSelectedTextObjects(canvas.getActiveObjects(), { textAlign: textAlignment.value });
+    });
 });
 
-// Add rectangle with unique label to canvas on button click
 $('#rectangle').on('click', function () {
     canvas.isDrawingMode = false;
 
@@ -297,7 +264,6 @@ $('#rectangle').on('click', function () {
     canvas.add(group);
 });
 
-// Remove selected objects from canvas on button click
 $('#remove').on('click', function () {
     canvas.isDrawingMode = false;
     const activeObjects = canvas.getActiveObjects();
@@ -305,8 +271,7 @@ $('#remove').on('click', function () {
     canvas.discardActiveObject().renderAll();
 });
 
-// Event handler for selection created on canvas
-canvas.on('selection:created', (event) => {
+const updateSelection = (event) => {
     const selectedObjects = event.selected;
     $('#remove').prop('disabled', selectedObjects.length === 0);
     if (selectedObjects.length === 1 && selectedObjects[0].type === 'i-text') {
@@ -314,16 +279,21 @@ canvas.on('selection:created', (event) => {
         fontFamilySelect.value = selectedObject.fontFamily;
         textColorInput.value = selectedObject.fill;
         fontSizeInput.value = selectedObject.fontSize;
+        textAlignment.value = selectedObject.textAlign;
+        console.log(textAlignment.value);
         lockTextObject(selectedObject);
     }
-});
+};
 
-// Event handler for selection cleared on canvas
+canvas.on('selection:created', updateSelection);
+canvas.on('selection:updated', updateSelection);
+
 canvas.on('selection:cleared', function () {
     $('#remove').prop('disabled', 'disabled');
     fontFamilySelect.disabled = false;
     textColorInput.disabled = false;
     fontSizeInput.disabled = false;
+    textAlignment.disabled = false;
 });
 
 $(document).ready(function() {
@@ -333,7 +303,7 @@ $(document).ready(function() {
                 const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
                 return {
                     text: text ? text.text : '',
-                    type: 'group',
+                    type: 'image',
                     left: obj.left,
                     top: obj.top,
                     width: obj.width,
@@ -344,7 +314,9 @@ $(document).ready(function() {
                 return {
                     text: obj.text || '',
                     type: obj.type,
+                    align: obj.textAlign,
                     left: obj.left,
+                    right: obj.left + obj.width,
                     top: obj.top,
                     width: obj.width,
                     height: obj.height,
@@ -356,10 +328,13 @@ $(document).ready(function() {
             }
         });
 
-        const jsonData = JSON.stringify(canvasObjects, null, 2);
-        const saveUrl = `/save?type=${layoutType}`;
+        const overlay = document.querySelector('.upper-canvas');
+        const overlayWidth = overlay.clientWidth;
+        const overlayHeight = overlay.clientHeight;
 
-        // Send data to Flask using Fetch API
+        const jsonData = JSON.stringify(canvasObjects, null, 2);
+        const saveUrl = `/${projectName}/save?type=${layoutType}&width=${overlayWidth}&height=${overlayHeight}`;
+
         fetch(saveUrl, {
             method: 'POST',
             body: jsonData,
@@ -367,10 +342,10 @@ $(document).ready(function() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);  // Handle success response from Flask
+            console.log(data);
         })
         .catch(error => {
-            console.error(error);  // Handle errors during request
+            console.error('Error saving canvas data:', error);
         });
     });
 });

@@ -3,9 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <title>IDAssembler | Home</title>
 </head>
 <body>
-    hello world!
+    <button id="new-project">New Project</button>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>New Project</h2>
+            </div>
+            <div>
+                <label for="projectName">Project Name:</label>
+                <input type="text" id="projectName" name="projectName" required>
+                <span class="required-message">* Required</span>
+                <button id="submitProjectName">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>
