@@ -162,8 +162,6 @@ cython_debug/
 #.idea/
 
 # Developer Defined
-front.png
-back.png
 back_layout.xlsx
 front_layout.xlsx
 try.png
