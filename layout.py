@@ -40,6 +40,8 @@ class LayoutPage:
     @app.route('/<project_name>/save', methods=['POST'])
     def save_canvas_data(project_name):
         layout_type = request.args.get('type')
+        client_width = int(request.args.get('width'))
+        client_height = int(request.args.get('height'))
         if layout_type not in ['front', 'back']:
             return jsonify(success=False, message='Invalid layout type')
 
@@ -55,7 +57,7 @@ class LayoutPage:
         try:
             overlayGenerator = OverlayGenerator()
             overlay_path = os.path.join('projects', project_name, 'try.png')
-            overlayGenerator.generate_image(data, 865, 495, overlay_path)
+            overlayGenerator.generate_image(data, client_width, client_height, overlay_path)
 
         except Exception as e:
             print(f"Error generating overlay image: {e}")

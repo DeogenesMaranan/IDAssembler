@@ -356,8 +356,12 @@ $(document).ready(function() {
             }
         });
 
+        const place = document.querySelector('.upper-canvas');
+        const canvasWidth = place.clientWidth;
+        const canvasHeight = place.clientHeight;
+
         const jsonData = JSON.stringify(canvasObjects, null, 2);
-        const saveUrl = `/${projectName}/save?type=${layoutType}`; // Adjusted saveUrl to include projectName
+        const saveUrl = `/${projectName}/save?type=${layoutType}&width=${canvasWidth}&height=${canvasHeight}`;
 
         // Send data to Flask using Fetch API
         fetch(saveUrl, {
