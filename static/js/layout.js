@@ -133,6 +133,7 @@ const fontFamilySelect = document.getElementById('font-family');
 const fontSizeInput = document.getElementById('font-size');
 const textColorInput = document.getElementById('text-color');
 const fileInput = document.getElementById('fileInput');
+const textAlignment = document.getElementById('text-alignment');
 
 fonts.forEach(font => {
     const option = document.createElement('option');
@@ -167,12 +168,13 @@ $('#text').on('click', () => {
     }
 
     const text = new fabric.IText(newText, {
-        left: 40,
-        top: 40,
+        left: 40 + (number*5),
+        top: 40 + (number*5),
         objecttype: 'text',
         fontFamily: fontFamilySelect.value,
         fill: textColorInput.value,
-        fontSize: parseInt(fontSizeInput.value, 10) || 40
+        fontSize: parseInt(fontSizeInput.value, 10) || 40,
+        textAlign: textAlignment.value
     });
 
     lockTextObject(text);
@@ -222,6 +224,9 @@ fileInput.addEventListener('change', (event) => {
     fontSizeInput.addEventListener(event, () => {
         updateSelectedTextObjects(canvas.getActiveObjects(), { fontSize: parseInt(fontSizeInput.value, 10) });
     });
+    textAlignment.addEventListener(event, () => {
+        updateSelectedTextObjects(canvas.getActiveObjects(), { textAlign: textAlignment.value });
+    });
 });
 
 $('#rectangle').on('click', function () {
@@ -266,7 +271,7 @@ $('#remove').on('click', function () {
     canvas.discardActiveObject().renderAll();
 });
 
-canvas.on('selection:created', (event) => {
+const updateSelection = (event) => {
     const selectedObjects = event.selected;
     $('#remove').prop('disabled', selectedObjects.length === 0);
     if (selectedObjects.length === 1 && selectedObjects[0].type === 'i-text') {
@@ -274,15 +279,21 @@ canvas.on('selection:created', (event) => {
         fontFamilySelect.value = selectedObject.fontFamily;
         textColorInput.value = selectedObject.fill;
         fontSizeInput.value = selectedObject.fontSize;
+        textAlignment.value = selectedObject.textAlign;
+        console.log(textAlignment.value);
         lockTextObject(selectedObject);
     }
-});
+};
+
+canvas.on('selection:created', updateSelection);
+canvas.on('selection:updated', updateSelection);
 
 canvas.on('selection:cleared', function () {
     $('#remove').prop('disabled', 'disabled');
     fontFamilySelect.disabled = false;
     textColorInput.disabled = false;
     fontSizeInput.disabled = false;
+    textAlignment.disabled = false;
 });
 
 $(document).ready(function() {
@@ -292,7 +303,7 @@ $(document).ready(function() {
                 const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
                 return {
                     text: text ? text.text : '',
-                    type: 'group',
+                    type: 'image',
                     left: obj.left,
                     top: obj.top,
                     width: obj.width,
@@ -303,7 +314,9 @@ $(document).ready(function() {
                 return {
                     text: obj.text || '',
                     type: obj.type,
+                    align: obj.textAlign,
                     left: obj.left,
+                    right: obj.left + obj.width,
                     top: obj.top,
                     width: obj.width,
                     height: obj.height,
@@ -315,12 +328,12 @@ $(document).ready(function() {
             }
         });
 
-        const place = document.querySelector('.upper-canvas');
-        const canvasWidth = place.clientWidth;
-        const canvasHeight = place.clientHeight;
+        const overlay = document.querySelector('.upper-canvas');
+        const overlayWidth = overlay.clientWidth;
+        const overlayHeight = overlay.clientHeight;
 
         const jsonData = JSON.stringify(canvasObjects, null, 2);
-        const saveUrl = `/${projectName}/save?type=${layoutType}&width=${canvasWidth}&height=${canvasHeight}`;
+        const saveUrl = `/${projectName}/save?type=${layoutType}&width=${overlayWidth}&height=${overlayHeight}`;
 
         fetch(saveUrl, {
             method: 'POST',

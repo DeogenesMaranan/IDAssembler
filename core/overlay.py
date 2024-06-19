@@ -36,14 +36,19 @@ class OverlayGenerator:
                 font_size = self.find_optimal_font_size(item["text"], item["fontFamily"], item["width"], item["height"])
                 prop = FontProperties(family=item["fontFamily"], size=font_size)
                 
-                x = item["left"]
-                y = canvas_height - item["top"] - (font_size/4)
+                x = item[item["align"]]
+                y = canvas_height - item["top"] - font_size / 4
                 
                 if y < 0:
                     continue
 
-                text = ax.text(x, y, item["text"], fontproperties=prop, va='top', ha='left', color=item["fill"], clip_on=True)
+                text = ax.text(x, y, item["text"], fontproperties=prop, va='top', ha='left', color=item["fill"], clip_on=True)  # Adjusted ha parameter
                 text.set_bbox(dict(facecolor='white', alpha=0.0))
+                text_width = text.get_window_extent(renderer=fig.canvas.get_renderer()).width
+                if item["align"] == "center":
+                    text.set_x(x + text_width / 2)  # Adjusted center alignment
+                elif item["align"] == "right":
+                    text.set_x(x - text_width)  # Adjusted right alignment
 
         fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.savefig(output_path, bbox_inches='tight', pad_inches=0, transparent=True)
