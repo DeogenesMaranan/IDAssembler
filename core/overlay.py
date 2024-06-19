@@ -46,9 +46,9 @@ class OverlayGenerator:
                 text.set_bbox(dict(facecolor='white', alpha=0.0))
                 text_width = text.get_window_extent(renderer=fig.canvas.get_renderer()).width
                 if item["align"] == "center":
-                    text.set_x(x + text_width / 2)  # Adjusted center alignment
+                    text.set_x(x + text_width / 2)
                 elif item["align"] == "right":
-                    text.set_x(x - text_width)  # Adjusted right alignment
+                    text.set_x(x - text_width)
 
         fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.savefig(output_path, bbox_inches='tight', pad_inches=0, transparent=True)
