@@ -6,20 +6,19 @@
     <title>Project Details</title>
 </head>
 <body>
-    <h1>Project Details</h1>
-    
-    <div>
-        <a href="{{ url_for('download_layout', project_name=project_name, type='front') }}" download="{{ front_filename }}">Download Front Layout</a>
-
-    </div>
-    
-    <div>
-        <a href="{{ url_for('download_layout', project_name=project_name, type='back') }}" download="{{ back_filename }}">Download Back Layout</a>
-
-    </div>
-
     <div>
         <p>Project Name: {{ project_name }}</p>
+        <p>Front: {{ front_image_count }}</p>
+        <p>Back: {{ back_image_count }}</p>
     </div>
+    
+    <div>
+        <button class="edit-layout" id="edit-layout-front">edit-layout-front</button>
+        <a href="{{ url_for('download_layout', project_name=project_name, type='front') }}" download="{{ front_filename }}">Download Front Layout</a>
+        <button class="edit-layout" id="edit-layout-back">edit-layout-back</button>
+        <a href="{{ url_for('download_layout', project_name=project_name, type='back') }}" download="{{ back_filename }}">Download Back Layout</a>
+    </div>
+
+
 </body>
 </html>

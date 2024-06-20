@@ -23,6 +23,14 @@ def initialize_project(project_name):
         except Exception as e:
             print(f"Error copying template: {e}")
 
+def count_folders_starts_with(path, folder_prefix):
+    count = int(0)
+    for entry in os.listdir(path):
+        full_path = os.path.join(path, entry)
+        if os.path.isdir(full_path) and entry.startswith(folder_prefix):
+            count += 1
+    return count
+
 class ErrorHandling:
     @app.errorhandler(HTTPException)
     def handle_http_exception(e):
