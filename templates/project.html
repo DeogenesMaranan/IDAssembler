@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Project Details</title>
 </head>
 <body>
-    project
+    <h1>Project Details</h1>
+    
+    <div>
+        <a href="{{ url_for('download_layout', project_name=project_name, type='front') }}" download="{{ front_filename }}">Download Front Layout</a>
+
+    </div>
+    
+    <div>
+        <a href="{{ url_for('download_layout', project_name=project_name, type='back') }}" download="{{ back_filename }}">Download Back Layout</a>
+
+    </div>
+
+    <div>
+        <p>Project Name: {{ project_name }}</p>
+    </div>
 </body>
 </html>
