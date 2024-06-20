@@ -1,6 +1,7 @@
 from common import *
 from index import *
 from layout import *
+from project import *
 
 @app.route("/ping", methods=["GET"])
 def ping():

@@ -4,7 +4,7 @@ from core.overlay import *
 
 class LayoutPage:
     @app.route('/<project_name>/layout', methods=['GET'])
-    def upload(project_name):
+    def show_layout(project_name):
         layout_type = request.args.get('type')
         initialize_project(project_name)
         if layout_type in ['front', 'back']:

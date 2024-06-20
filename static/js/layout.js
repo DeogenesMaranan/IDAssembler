@@ -346,6 +346,9 @@ $(document).ready(function() {
             if (layoutType === 'front'){
                 window.location.href = `/${projectName}/layout?type=back`;
             }
+            else{
+                window.location.href = `/${projectName}`;
+            }
         })
         .catch(error => {
             console.error('Error saving canvas data:', error);
