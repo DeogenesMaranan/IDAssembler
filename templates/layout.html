@@ -11,6 +11,7 @@
     <div id="controlbox">
         {{ layout_type }}
         {{ url_for('uploaded_backgrounds', project_name=project_name, filename=layout_type + '.png') }}
+        <button id="next">next</button>
     </div>
 
     <div class="bottom" id="toolbox">
@@ -30,7 +31,6 @@
             </div>
         <button id="text">Add Text</button>
         <button id="remove" disabled="disabled">Remove</button>
-        <button id="save">Save Canvas Data</button>
         <button id="rectangle">Add Rectangle</button>
     </div>
 

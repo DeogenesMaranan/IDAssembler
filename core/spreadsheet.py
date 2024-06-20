@@ -1,7 +1,7 @@
 import pandas as pd
 
 def save_to_excel(data, filename):
-	column_headers = [obj['text'] for obj in data if obj['type'] != 'group']
+	column_headers = [obj['text'] for obj in data if obj['type'] != 'image']
 	df_data = pd.DataFrame(columns=column_headers)
 	
 	df_positions = pd.DataFrame(data)

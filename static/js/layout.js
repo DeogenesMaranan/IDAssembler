@@ -297,7 +297,7 @@ canvas.on('selection:cleared', function () {
 });
 
 $(document).ready(function() {
-    $('#save').click(function() {
+    $('#next').click(function() {
         const canvasObjects = canvas.getObjects().map(obj => {
             if (obj.type === 'group') {
                 const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
@@ -342,10 +342,14 @@ $(document).ready(function() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            console.log('Canvas data saved successfully:', data);
+            if (layoutType === 'front'){
+                window.location.href = `/${projectName}/layout?type=back`;
+            }
         })
         .catch(error => {
             console.error('Error saving canvas data:', error);
         });
     });
 });
+

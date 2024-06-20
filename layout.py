@@ -57,7 +57,7 @@ class LayoutPage:
         
         try:
             overlayGenerator = OverlayGenerator()
-            overlay_path = os.path.join('projects', project_name, 'try.png')
+            overlay_path = os.path.join('projects', project_name, f'{layout_type}_overlay.png')
             overlayGenerator.generate_image(data, client_width, client_height, overlay_path)
 
         except Exception as e:
@@ -65,3 +65,4 @@ class LayoutPage:
             return jsonify(success=False, message="Error generating overlay image")
 
         return jsonify(success=True, message=f"{layout_type.capitalize()} Layout Data and Overlay Image Saved Successfully")
+        
