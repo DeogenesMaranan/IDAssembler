@@ -18,7 +18,21 @@
         <button class="edit-layout" id="edit-layout-back">edit-layout-back</button>
         <a href="{{ url_for('download_layout', project_name=project_name, type='back') }}" download="{{ back_filename }}">Download Back Layout</a>
     </div>
+    <button class="upload-data" id="upload-data-front">upload-data-front</button>
+    <button class="upload-data" id="upload-data-back">upload-data-back</button>
+    <input type="file" id="data-file-input" accept=".xlsx" style="display: none;">
 
+    <div id="upload-images-front"></div>
+    <div id="upload-images-back"></div>
+    <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+    <script>
+        const frontImageCount = "{{ front_image_count }}";
+        const backImageCount = "{{ back_image_count }}";
+        const projectName = "{{ project_name }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/project.js') }}"></script>
 
 </body>
 </html>
