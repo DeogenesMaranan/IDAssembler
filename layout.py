@@ -49,7 +49,7 @@ class LayoutPage:
         data = request.get_json()
         print(f"{layout_type.capitalize()} Layout Data Saved Successfully")
         try:
-            save_to_excel(data, os.path.join('projects', project_name, f'{layout_type}_layout.xlsx'))
+            save_to_spreadsheet(data, os.path.join('projects', project_name, f'{layout_type}_layout.xlsx'))
 
         except Exception as e:
             print(f"Error saving data: {e}")
