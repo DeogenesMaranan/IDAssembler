@@ -3,13 +3,13 @@ import pandas as pd
 
 class SpreadSheetManager:
     def save_spreadsheet_file(data, filename):
-        column_headers = [obj['text'] for obj in data if obj['type'] != 'image']
+        column_headers = [obj['text'] for obj in data if obj['type'] == 'i-text']
         df_data = pd.DataFrame(columns=column_headers)
         df_positions = pd.DataFrame(data)
 
-        with pd.spreadsheetWriter(filename, engine='xlsxwriter') as writer:
-            df_data.to_spreadsheet(writer, sheet_name='data', index=False)
-            df_positions.to_spreadsheet(writer, sheet_name='DeveloperOnly', index=False)
+        with pd.ExcelWriter(filename, engine='xlsxwriter') as writer:
+            df_data.to_excel(writer, sheet_name='data', index=False)
+            df_positions.to_excel(writer, sheet_name='DeveloperOnly', index=False)
             worksheet_positions = writer.sheets['DeveloperOnly']
             worksheet_positions.protect(password='DeveloperOnly')
             worksheet_positions.hide()
@@ -33,9 +33,9 @@ class SpreadSheetManager:
 
         SpreadSheetManager.save_spreadsheet_file(data, backup_filename)
 
-    def load_spreadsheet_developer_only(filename):
-        with pd.spreadsheetFile(filename) as xls:
-            df_positions = pd.read_spreadsheet(xls, sheet_name='DeveloperOnly')
+    def load_spreadsheet_developer_only(self, filename):
+        with pd.ExcelFile(filename) as xls:
+            df_positions = pd.read_excel(xls, sheet_name='DeveloperOnly')
 
         data = []
 
@@ -45,13 +45,13 @@ class SpreadSheetManager:
 
         return data
 
-    def load_spreadsheet_data(filename):
+    def load_spreadsheet_data(self, filename):
         with pd.ExcelFile(filename) as xls:
             df_data = pd.read_excel(xls, sheet_name='data')
             
         data = []
         
-        for index, row in df_data.iterrows():
+        for _, row in df_data.iterrows():
             row_dict = row.to_dict()
             data.append(row_dict)
 
