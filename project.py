@@ -55,3 +55,18 @@ class ProjectManager:
             file.save(os.path.join('projects', project_name, filename))
 
         return jsonify(success=True)
+    
+    @app.route('/<project_name>/generateOverlay', methods=['POST'])
+    def generate_overlay(project_name):
+        ssm = SpreadSheetManager()
+        og = OverlayGenerator()
+        try:
+            devOnly = ssm.load_spreadsheet_developer_only(os.path.join('projects', project_name, 'front_layout.xlsx'))
+            data = ssm.load_spreadsheet_data(os.path.join('projects', project_name, 'front_layout.xlsx'))
+            og.generate_bulk(data, devOnly, os.path.join('projects', project_name, 'overlays', 'front'))
+            return jsonify(success=True)
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return jsonify(success=False, error=str(e))
+

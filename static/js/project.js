@@ -102,3 +102,23 @@ function uploadData(file, layoutType) {
         }
     });
 }
+
+$('#generate-bulk-front').on('click', function() {
+    generateOverlay();
+});
+
+function generateOverlay() {
+    const targetUrl = `/${projectName}/generateOverlay`;
+
+    $.ajax({
+        url: targetUrl,
+        type: 'POST',
+        success: function(response) {
+            console.log("Request succeeded:", response);
+        },
+        error: function(error) {
+            console.error("Request failed:", error);
+        }
+    });
+}
+

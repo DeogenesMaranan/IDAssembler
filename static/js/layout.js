@@ -316,6 +316,7 @@ $(document).ready(function() {
                     type: obj.type,
                     align: obj.textAlign,
                     left: obj.left,
+                    center: (obj.left + obj.width)/2,
                     right: obj.left + obj.width,
                     top: obj.top,
                     width: obj.width,
@@ -332,8 +333,13 @@ $(document).ready(function() {
         const overlayWidth = overlay.clientWidth;
         const overlayHeight = overlay.clientHeight;
 
+        canvasObjects.push(
+            { 'text': overlayWidth, 'type': 'client_width' },
+            { 'text': overlayHeight, 'type': 'client_height' }
+        );
+
         const jsonData = JSON.stringify(canvasObjects, null, 2);
-        const saveUrl = `/${projectName}/save?type=${layoutType}&width=${overlayWidth}&height=${overlayHeight}`;
+        const saveUrl = `/${projectName}/save?type=${layoutType}`;
 
         fetch(saveUrl, {
             method: 'POST',
