@@ -351,12 +351,7 @@ $('#next').click(function() {
     .then(response => response.json())
     .then(data => {
         console.log('Canvas data saved successfully:', data);
-        if (layoutType === 'front'){
-            window.location.href = `/${projectName}/layout?type=back`;
-        }
-        else{
-            window.location.href = `/${projectName}`;
-        }
+        window.location.href = `/${projectName}`;
     })
     .catch(error => {
         console.error('Error saving canvas data:', error);

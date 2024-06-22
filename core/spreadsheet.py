@@ -33,9 +33,13 @@ class SpreadSheetManager:
 
         SpreadSheetManager.save_spreadsheet_file(data, backup_filename)
 
+    import pandas as pd
+
     def load_spreadsheet_developer_only(self, filename):
         with pd.ExcelFile(filename) as xls:
             df_positions = pd.read_excel(xls, sheet_name='DeveloperOnly')
+
+        df_positions = df_positions.fillna("<empty>")
 
         data = []
 
@@ -44,6 +48,7 @@ class SpreadSheetManager:
             data.append(obj)
 
         return data
+
 
     def load_spreadsheet_data(self, filename):
         with pd.ExcelFile(filename) as xls:
