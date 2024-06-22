@@ -2,10 +2,10 @@ const fileInput = $('#file-input')[0];
 const dataFileInput = $('#data-file-input')[0];
 
 function createButtons(containerId, count, prefix) {
-    var container = $('#' + containerId);
-    for (var i = 0; i < count; i++) {
-        var button = $('<button></button>');
-        button.attr('id', i === 0 ? prefix : prefix + ' ' + i);
+    const container = $('#' + containerId);
+    for (let i = 0; i < count; i++) {
+        const button = $('<button></button>');
+        button.attr('id', i === 0 ? prefix : `${prefix} ${i}`);
         button.text(button.attr('id'));
         button.on('click', function() {
             handleFileInput().then(() => {
@@ -15,9 +15,6 @@ function createButtons(containerId, count, prefix) {
         container.append(button);
     }
 }
-
-createButtons('upload-images-front', frontImageCount, 'front_layout_Image');
-createButtons('upload-images-back', backImageCount, 'back_layout_Image');
 
 function handleFileInput() {
     return new Promise((resolve) => {
@@ -29,10 +26,10 @@ function handleFileInput() {
 }
 
 function uploadImages(folder) {
-    var files = $(fileInput)[0].files;
-    var formData = new FormData();
+    const files = $(fileInput)[0].files;
+    const formData = new FormData();
     formData.append('folder', folder);
-    for (var i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
         formData.append('file', files[i]);
     }
 
@@ -55,7 +52,6 @@ function uploadImages(folder) {
         }
     });
 }
-
 
 function handleDataFileInput(layoutType) {
     return new Promise((resolve) => {
@@ -103,8 +99,18 @@ function uploadData(file, layoutType) {
     });
 }
 
-$('#generate-bulk-front').on('click', function() {
-    generateOverlay();
+$(document).ready(function() {
+    $('#edit-layout-front').click(function() {
+        window.location.href = `/${projectName}/layout?type=front`;
+    });
+
+    $('#edit-layout-back').click(function() {
+        window.location.href = `/${projectName}/layout?type=back`;
+    });
+
+    $('#generate-bulk-front').on('click', function() {
+        generateOverlay();
+    });
 });
 
 function generateOverlay() {
@@ -121,4 +127,3 @@ function generateOverlay() {
         }
     });
 }
-

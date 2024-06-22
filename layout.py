@@ -53,4 +53,22 @@ class LayoutPage:
             return jsonify(success=False, message="Error saving data")
 
         return jsonify(success=True, message=f"{layout_type.capitalize()} Layout Data Saved Successfully")
-        
+    
+    @app.route('/<project_name>/load', methods=['GET'])
+    def load_canvas_state(project_name):
+        try:
+            layout_type = request.args.get('type')
+            if not layout_type:
+                return jsonify({'success': False, 'message': 'Layout type not specified'}), 400
+
+            filepath = os.path.join('projects', project_name, f'{layout_type}_layout.xlsx')
+            
+            if not os.path.exists(filepath):
+                return jsonify({'success': True, 'objects': []})
+            ssm = SpreadSheetManager()
+            result = ssm.load_spreadsheet_developer_only(filepath)
+            result_json = json.dumps(result[:-2])
+            return jsonify(result_json)
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
