@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, url_for, jsonify
+from flask import Flask, render_template, request, redirect, send_from_directory, url_for, jsonify, send_file, Response
 from werkzeug.exceptions import *
 from flask_cors import CORS
 import os
 import shutil
+import json
+from core.spreadsheet import *
+from core.overlay import *
 
 app = Flask(__name__)
 CORS(app)
@@ -22,6 +25,14 @@ def initialize_project(project_name):
             print(f"Template '{template_folder}' copied and renamed to '{project_name}' successfully.")
         except Exception as e:
             print(f"Error copying template: {e}")
+
+def count_folders_starts_with(path, folder_prefix):
+    count = int(0)
+    for entry in os.listdir(path):
+        full_path = os.path.join(path, entry)
+        if os.path.isdir(full_path) and entry.startswith(folder_prefix):
+            count += 1
+    return count
 
 class ErrorHandling:
     @app.errorhandler(HTTPException)

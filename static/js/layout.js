@@ -1,5 +1,6 @@
 const initializeCanvas = (id, defaultImageUrl) => {
     const canvas = new fabric.Canvas(id, {});
+    loadCanvasState();
 
     if (defaultImageUrl) {
         fabric.Image.fromURL(defaultImageUrl, (img) => {
@@ -296,56 +297,128 @@ canvas.on('selection:cleared', function () {
     textAlignment.disabled = false;
 });
 
-$(document).ready(function() {
-    $('#save').click(function() {
-        const canvasObjects = canvas.getObjects().map(obj => {
-            if (obj.type === 'group') {
-                const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
-                return {
-                    text: text ? text.text : '',
-                    type: 'image',
-                    left: obj.left,
-                    top: obj.top,
-                    width: obj.width,
-                    height: obj.height,
-                    angle: obj.angle,
-                };
-            } else {
-                return {
-                    text: obj.text || '',
-                    type: obj.type,
-                    align: obj.textAlign,
-                    left: obj.left,
-                    right: obj.left + obj.width,
-                    top: obj.top,
-                    width: obj.width,
-                    height: obj.height,
-                    angle: obj.angle,
-                    fill: obj.fill,
-                    fontFamily: obj.fontFamily,
-                    fontSize: obj.fontSize
-                };
-            }
-        });
+$('#next').click(function() {
+    const canvasObjects = canvas.getObjects().map(obj => {
+        if (obj.type === 'group') {
+            const text = obj.getObjects().find(innerObj => innerObj.type === 'text');
+            return {
+                id: obj.id,
+                text: text ? text.text : '',
+                type: 'image',
+                left: obj.left,
+                top: obj.top,
+                width: obj.width * obj.scaleX,
+                height: obj.height * obj.scaleY,
+                angle: obj.angle,
+            };
+        } else {
+            return {
+                id: obj.id,
+                text: obj.text || '',
+                type: obj.type,
+                align: obj.textAlign,
+                left: obj.left,
+                center: obj.left + (obj.width/2),
+                right: obj.left + obj.width,
+                top: obj.top,
+                width: obj.width,
+                height: obj.height,
+                angle: obj.angle,
+                fill: obj.fill,
+                fontFamily: obj.fontFamily,
+                fontSize: obj.fontSize
+            };
+        }
+    });
 
-        const overlay = document.querySelector('.upper-canvas');
-        const overlayWidth = overlay.clientWidth;
-        const overlayHeight = overlay.clientHeight;
+    const overlay = document.querySelector('.upper-canvas');
+    const overlayWidth = overlay.clientWidth;
+    const overlayHeight = overlay.clientHeight;
 
-        const jsonData = JSON.stringify(canvasObjects, null, 2);
-        const saveUrl = `/${projectName}/save?type=${layoutType}&width=${overlayWidth}&height=${overlayHeight}`;
+    canvasObjects.push(
+        { 'text': overlayWidth, 'type': 'client_width' },
+        { 'text': overlayHeight, 'type': 'client_height' }
+    );
 
-        fetch(saveUrl, {
-            method: 'POST',
-            body: jsonData,
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Error saving canvas data:', error);
-        });
+    const jsonData = JSON.stringify(canvasObjects, null, 2);
+    const saveUrl = `/${projectName}/save?type=${layoutType}`;
+
+    fetch(saveUrl, {
+        method: 'POST',
+        body: jsonData,
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Canvas data saved successfully:', data);
+        window.location.href = `/${projectName}`;
+    })
+    .catch(error => {
+        console.error('Error saving canvas data:', error);
     });
 });
+
+function loadCanvasState() {
+
+    const loadUrl = `/${projectName}/load?type=${layoutType}`;
+
+    $.ajax({
+        url: loadUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            console.log(data);
+            const objects = JSON.parse(data);
+            objects.forEach(obj => {
+                let fabricObject;
+
+                if (obj.type === 'i-text') {
+                    fabricObject = new fabric.IText(obj.text, {
+                        left: obj.left,
+                        top: obj.top,
+                        fontFamily: obj.fontFamily,
+                        fill: obj.fill,
+                        fontSize: obj.fontSize,
+                        textAlign: obj.align,
+                        angle: obj.angle
+                    });
+                    lockTextObject(fabricObject);
+                } else if (obj.type === 'image') {
+                    const rectangle = new fabric.Rect({
+                        left: obj.left,
+                        top: obj.top,
+                        width: obj.width,
+                        height: obj.height,
+                        fill: 'Red'
+                    });
+
+                    const label = new fabric.Text(obj.text, {
+                        left: obj.left + obj.width / 2,
+                        top: obj.top + obj.height / 2 - 6,
+                        fontSize: 10,
+                        fill: 'white',
+                        originX: 'center',
+                        selectable: false
+                    });
+
+                    fabricObject = new fabric.Group([rectangle, label], {
+                        left: obj.left,
+                        top: obj.top,
+                        width: obj.width,
+                        height: obj.height,
+                        angle: obj.angle,
+                        selectable: true
+                    });
+                }
+
+                fabricObject.id = obj.id;
+                canvas.add(fabricObject);
+            });
+
+            canvas.renderAll();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching canvas state:', error);
+        }
+    });
+}

@@ -1,10 +1,8 @@
 from common import *
-from core.spreadsheet import *
-from core.overlay import *
 
 class LayoutPage:
     @app.route('/<project_name>/layout', methods=['GET'])
-    def upload(project_name):
+    def show_layout(project_name):
         layout_type = request.args.get('type')
         initialize_project(project_name)
         if layout_type in ['front', 'back']:
@@ -41,27 +39,36 @@ class LayoutPage:
     @app.route('/<project_name>/save', methods=['POST'])
     def save_canvas_data(project_name):
         layout_type = request.args.get('type')
-        client_width = int(request.args.get('width'))
-        client_height = int(request.args.get('height'))
         if layout_type not in ['front', 'back']:
             return jsonify(success=False, message='Invalid layout type')
 
         data = request.get_json()
+
         print(f"{layout_type.capitalize()} Layout Data Saved Successfully")
         try:
-            save_to_excel(data, os.path.join('projects', project_name, f'{layout_type}_layout.xlsx'))
+            SpreadSheetManager.save_to_spreadsheet(data, os.path.join('projects', project_name, f'{layout_type}_layout.xlsx'))
 
         except Exception as e:
             print(f"Error saving data: {e}")
             return jsonify(success=False, message="Error saving data")
-        
+
+        return jsonify(success=True, message=f"{layout_type.capitalize()} Layout Data Saved Successfully")
+    
+    @app.route('/<project_name>/load', methods=['GET'])
+    def load_canvas_state(project_name):
         try:
-            overlayGenerator = OverlayGenerator()
-            overlay_path = os.path.join('projects', project_name, 'try.png')
-            overlayGenerator.generate_image(data, client_width, client_height, overlay_path)
+            layout_type = request.args.get('type')
+            if not layout_type:
+                return jsonify({'success': False, 'message': 'Layout type not specified'}), 400
+
+            filepath = os.path.join('projects', project_name, f'{layout_type}_layout.xlsx')
+            
+            if not os.path.exists(filepath):
+                return jsonify({'success': True, 'objects': []})
+            ssm = SpreadSheetManager()
+            result = ssm.load_spreadsheet_developer_only(filepath)
+            result_json = json.dumps(result[:-2])
+            return jsonify(result_json)
 
         except Exception as e:
-            print(f"Error generating overlay image: {e}")
-            return jsonify(success=False, message="Error generating overlay image")
-
-        return jsonify(success=True, message=f"{layout_type.capitalize()} Layout Data and Overlay Image Saved Successfully")
+            return jsonify({'success': False, 'message': str(e)}), 500
