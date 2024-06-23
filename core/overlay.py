@@ -119,7 +119,7 @@ class OverlayGenerator:
             text_width = text.get_window_extent(renderer=fig.canvas.get_renderer()).width
 
             if item["Align"] == "center":
-                text.set_x(x + text_width / 2)
+                text.set_x(x - text_width / 2)
             elif item["Align"] == "right":
                 text.set_x(x - text_width)
 

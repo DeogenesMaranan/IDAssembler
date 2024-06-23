@@ -318,7 +318,7 @@ $('#next').click(function() {
                 type: obj.type,
                 align: obj.textAlign,
                 left: obj.left,
-                center: (obj.left + obj.width)/2,
+                center: obj.left + (obj.width/2),
                 right: obj.left + obj.width,
                 top: obj.top,
                 width: obj.width,
