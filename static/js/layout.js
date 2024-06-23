@@ -307,8 +307,8 @@ $('#next').click(function() {
                 type: 'image',
                 left: obj.left,
                 top: obj.top,
-                width: obj.width,
-                height: obj.height,
+                width: obj.width * obj.scaleX,
+                height: obj.height * obj.scaleY,
                 angle: obj.angle,
             };
         } else {
